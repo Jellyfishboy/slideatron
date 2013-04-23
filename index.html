@@ -5,24 +5,24 @@
 
     <title>home made</title>
      <!--[if lte IE 8]><script src="excanvas.js"></script> <![endif]-->
-     <link rel="stylesheet" href="slider.css" type="text/css" media="screen" charset="utf-8">
+     <link rel="stylesheet" href="stylesheets/slider.css" type="text/css" media="screen" charset="utf-8">
+     <link rel="stylesheet" href="stylesheets/application.css" type="text/css" media="screen" charset="utf-8">
   </head>
   <body>
-    <div id="content">
+    <div id="content" data-slide="">
+      <div class="hedgehog locale-7 hedgehog-14" >A ball has unique physical properties. Housing more core technology inside a ball improves the new Dyson Ball™ vacuum cleaners in several ways.</div>
+      <div class="hedgehog locale-11 hedgehog-27">The Dyson digital motor is smaller, faster, more energy efficient and more powerful than conventional motors.</div> 
       <canvas id="myCanvas" width="500" height="500"></canvas>  
-    </div>
-    <div class="slider"> </div>
-    New snap:
-    <span class="value">0</span>
-    Current snap:
-    <span class="old_value">0</span>
-    <div class="mySlider">
-      <div class="button">
-        
-      </div>
+      <!-- slider -->
+      <div class="slider"> </div>
+      Current snap:
+      <span class="value">0</span>
+      Previous snap:
+      <span class="old_value">0</span>
     </div>
   </body>
   <script src="jquery-1.9.1.js" type="text/javascript" charset="utf-8"></script>
   <script src="jquery-ui-1.10.2.custom.min.js" type="text/javascript" charset="utf-8"></script>
   <script src="script.js" type="text/javascript" charset="utf-8"></script>
+  <script src="hedgehogs.js" type="text/javascript" charset="utf-8"></script>
 </html>

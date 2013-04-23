@@ -1,5 +1,4 @@
 $ = jQuery
-
 log = (message) ->
   if typeof(console) is 'object' then console.log(message) else return null
 
@@ -78,6 +77,7 @@ init = ->
       current_snap = $('.value').text()
       $('.old_value').html current_snap
       #appends value element with new snap
+      $('#content').attr "data-slide", ui.value
       $('.value').html ui.value
       new_snap = $('.value').text()
       #if slider is moved forwards
