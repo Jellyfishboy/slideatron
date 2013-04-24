@@ -133,3 +133,19 @@ updateCanvas = (ImgObj) ->
 
 $(document).ready ->
   init()
+
+$(window).load ->
+  #line1
+  drawLine = ->
+    context.fillStyle = "#000"
+    context.strokeStyle = "#000"
+    context.beginPath()
+    context.moveTo 125, 125
+    context.lineTo 125, 45
+    context.lineTo 20, 45
+    context.lineWidth = 1
+    context.stroke()
+    context.closePath()
+  canvas = document.getElementById("myCanvas")
+  context = canvas.getContext("2d")
+  drawLine 30, 30.5, 300, 30.5
