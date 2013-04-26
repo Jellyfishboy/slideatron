@@ -11,7 +11,7 @@ init = ->
   context = Canvas.getContext '2d'
   images = []
   
-  # Image array - would be cool if we could get this to read from a textfile, or even a directory
+  # Image array - This will be written to the head by sitecore
   imageSources = [
     'images/im01.png'
     'images/im02.png'
@@ -46,6 +46,7 @@ init = ->
     'images/im35.png'
   ]
 
+
   ### Load the images in to memory ###
   imagesLoaded = 0
   _loaded = false
@@ -76,8 +77,6 @@ init = ->
       #appends old value element with current snap
       current_snap = $('.value').text()
       $('.old_value').html current_snap
-      #appends value element with new snap
-      $('#content').attr "data-slide", ui.value
       $('.value').html ui.value
       new_snap = $('.value').text()
       #if slider is moved forwards
@@ -93,13 +92,13 @@ init = ->
           #increment the image array id
           current_img++
           #if current loop count is less or equal to total number of image to cycle through
-          if loop_img <= total_img          
+          if loop_img <= total_img
             #update canvas with current image
             updateCanvas images[current_img]
-            console.log "Image " + current_img
+            log "Image " + current_img
             #increment loop count
             loop_img++
-          else 
+          else
             clearInterval(forward_intv)
         , 50)
       #if slider is moved backwards
@@ -111,7 +110,7 @@ init = ->
           current_img--
           if loop_img >= total_img
             updateCanvas images[current_img]
-            console.log "Image " + current_img
+            log "Image " + current_img
             loop_img--
           else 
             clearInterval(reverse_intv)
@@ -119,6 +118,19 @@ init = ->
       #if slide value is only 1, execute a single image change
       else
         updateCanvas images[ui.value]
+      return
+    stop: (event, ui) ->
+      # find all elements on the current frame and add a class
+      $('.hedgehog-' + ui.value).addClass('active')
+      $('svg.hedgehog-' + ui.value).attr("class", "hedgehog active hedgehog-" + ui.value)
+      #for old IE
+      $('.hedgehog-' + ui.value + " .rvml").show()
+      # If using vml we have to be a bit more hardcore and target the rvml elements
+      return
+    start: (event, ui) ->
+      $('#content .active').removeClass('active')
+      $('svg.active').attr("class", "hedgehog hedgehog-" + ui.value)
+      $('.hedgehog .rvml').hide()
       return
   })
      
@@ -130,6 +142,40 @@ updateCanvas = (ImgObj) ->
     context.drawImage ImgObj, 0,0, 500, 500
   return
 
+# these are test image arrays
+# These could be automatically generated within sitecore
+lines = [
+  line1 = {
+    frame: 14
+    path: "M100,120L100,250L150,250"
+  }
+  line2 = {
+    frame: 27
+    path: "M250,450L200,400L200,350"
+  }
+]
 
-$(document).ready ->
+
+drawLines = (lineArray) ->
+  # make the paper for which to draw the lines on
+
+  for lineData in lineArray
+    # have to define an individual canvas for each set of lines as you can't apply classes to vml shapes
+    paper = Raphael $(".lines")[0], 500, 500
+    paper.canvas.style.position = "absolute"
+    $(paper.canvas).attr("class", "hedgehog hedgehog-" + lineData.frame)
+    line = paper.path lineData.path
+  
+  # after drawing the lines. Check if they're vml and make them invisible.
+  # Need to target th child elements because IE is super super lame
+  if Raphael.vml
+    # find all the rvml elements made by Raphael and hide them
+    $('.hedgehog .rvml').hide()
+
+  return
+
+
+$(window).load ->
   init()
+  drawLines(lines)
+  return
