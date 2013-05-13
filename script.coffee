@@ -5,6 +5,7 @@ log = (message) ->
 # Keep these as somewhat global
 Canvas = null
 context = null
+totalimages = null
 
 init = ->
   Canvas = document.getElementById 'myCanvas'
@@ -59,6 +60,7 @@ init = ->
       if imagesLoaded == imageSources.length
         draw()
         log "loaded"
+    totalimages = imageSources.length
 
   # Function is called once all images have been loaded in
   draw = ->
@@ -163,8 +165,17 @@ drawLines = (lineArray) ->
     # have to define an individual canvas for each set of lines as you can't apply classes to vml shapes
     paper = Raphael $(".lines")[0], 500, 500
     paper.canvas.style.position = "absolute"
-    $(paper.canvas).attr("class", "hedgehog hedgehog-" + lineData.frame)
+    $(paper.canvas).attr "class", "hedgehog hedgehog-" + lineData.frame
     line = paper.path lineData.path
+
+    # Setting up indicator element to be generated for each snap point dynamically
+    slider_width = $('.ui-slider').outerWidth();
+    indicator_loc = slider_width/totalimages*lineData.frame
+    # compensate for the size of the dot
+    indicator_pos = indicator_loc-6
+    indicator = "<span class='indicate indicator-" + lineData.frame + "'></span>"
+    $('.ui-slider').append indicator
+    $('.indicator-' + lineData.frame).css "left", indicator_pos
   
   # after drawing the lines. Check if they're vml and make them invisible.
   # Need to target th child elements because IE is super super lame
