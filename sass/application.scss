@@ -44,11 +44,22 @@
   	background-color:#333333;
   	height:10px;
   	width:10px;
-  	top:-20px;
+  	top:-22px;
+  	cursor:pointer;
+  	@include opacity(0.2);
+  	@include transition-property(opacity);
+  	@include transition-duration(0.4s);
+  	@include transition-timing-function(ease-in);
+  		&:hover {
+  			@include opacity(1);
+  		}
   }
   .indicate:nth-child(odd)
   {
-  	top:25px;
+  	top:22px;
+  }
+  .indicate_selected {
+  	@include opacity(1);
   }
 
 }

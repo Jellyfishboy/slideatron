@@ -6,6 +6,7 @@ log = (message) ->
 Canvas = null
 context = null
 totalimages = null
+current_snap = null
 
 init = ->
   Canvas = document.getElementById 'myCanvas'
@@ -81,6 +82,12 @@ init = ->
       $('.old_value').html current_snap
       $('.value').html ui.value
       new_snap = $('.value').text()
+      # highlighting indicators logic
+      if ($('.indicate').hasClass 'indicator-' + ui.value)
+        $('.indicate').removeClass "indicate_selected"
+        $('.indicator-' + ui.value).addClass "indicate_selected"
+      else
+        $('.indicate').removeClass "indicate_selected"
       #if slider is moved forwards
       if (new_snap-current_snap > 1)
         #total number of images to cycle through during transition
@@ -97,7 +104,7 @@ init = ->
           if loop_img <= total_img
             #update canvas with current image
             updateCanvas images[current_img]
-            log "Image " + current_img
+            # log "Image " + current_img
             #increment loop count
             loop_img++
           else
@@ -112,7 +119,7 @@ init = ->
           current_img--
           if loop_img >= total_img
             updateCanvas images[current_img]
-            log "Image " + current_img
+            # log "Image " + current_img
             loop_img--
           else 
             clearInterval(reverse_intv)
@@ -156,7 +163,6 @@ lines = [
     path: "M250,450L200,400L200,350"
   }
 ]
-
 
 drawLines = (lineArray) ->
   # make the paper for which to draw the lines on
