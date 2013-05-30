@@ -1,7 +1,7 @@
 Slideatron
 ==========
 
-HTML5/JS animation project
+Slide animation built with HTML5, CSS3 and Coffeescript.
 
 Usage
 =====
