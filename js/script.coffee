@@ -2,12 +2,22 @@ $ = jQuery
 log = (message) ->
   if typeof(console) is 'object' then console.log(message) else return null
 
+###
+# Lets start this up
+###
+$(window).load ->
+  init()
+  drawLines(lines)
+  return
+
+
 # Keep these as somewhat global
 Canvas = null
 context = null
 totalimages = null
 current_snap = null
 
+# If there's desire to have multiple swoop arounds, this will have to be refactored for 'each'
 init = ->
   Canvas = document.getElementById 'myCanvas'
   context = Canvas.getContext '2d'
@@ -68,7 +78,9 @@ init = ->
     updateCanvas(images[0])
     return
 
-  # Make the slider
+  ### 
+    Make the slider
+  ###
   $('.slider').slider({
     value: 0
     min: 0
@@ -121,7 +133,7 @@ init = ->
             updateCanvas images[current_img]
             # log "Image " + current_img
             loop_img--
-          else 
+          else
             clearInterval(reverse_intv)
         , 50)
       #if slide value is only 1, execute a single image change
@@ -129,20 +141,29 @@ init = ->
         updateCanvas images[ui.value]
       return
     stop: (event, ui) ->
-      # find all elements on the current frame and add a class
-      $('.hedgehog-' + ui.value).addClass('active')
-      $('svg.hedgehog-' + ui.value).attr("class", "hedgehog active hedgehog-" + ui.value)
-      #for old IE
-      $('.hedgehog-' + ui.value + " .rvml").show()
-      # If using vml we have to be a bit more hardcore and target the rvml elements
+      slideStop(ui.value)
       return
     start: (event, ui) ->
-      $('#content .active').removeClass('active')
-      $('svg.active').attr("class", "hedgehog hedgehog-" + ui.value)
-      $('.hedgehog .rvml').hide()
+      slideStart(ui.value)
       return
   })
      
+  return
+
+slideStart = (value) ->
+  $('#content .active').removeClass('active')
+  # removeClass doesn't work on svgs, have to do it by hand
+  $('svg.active').attr("class", "hedgehog hedgehog-" + value)
+  $('.hedgehog .rvml').hide()
+  return
+
+slideStop = (value) ->
+  # find all elements on the current frame and add a class
+  $('.hedgehog-' + value).addClass('active')
+  $('svg.hedgehog-' + value).attr("class", "hedgehog active hedgehog-" + value)
+  #for old IE
+  # If using vml we have to be a bit more hardcore and target the rvml elements
+  $('.hedgehog-' + value + " .rvml").show()
   return
 
 ## function takes an image and prints it to the canvas
@@ -175,7 +196,7 @@ drawLines = (lineArray) ->
     line = paper.path lineData.path
 
     # Setting up indicator element to be generated for each snap point dynamically
-    slider_width = $('.ui-slider').outerWidth();
+    slider_width = $('.ui-slider').outerWidth()
     indicator_loc = slider_width/totalimages*lineData.frame
     # compensate for the size of the dot
     indicator_pos = indicator_loc-6
@@ -191,8 +212,29 @@ drawLines = (lineArray) ->
 
   return
 
+###
+#  Mousewheel bindin'
+###
+$("#content").bind "mousewheel DOMMouseScroll", (e) ->
 
-$(window).load ->
-  init()
-  drawLines(lines)
-  return
+  delta = 0
+  sliderElement = $(this).find '.slider'
+  oe = e.originalEvent # for jQuery >=1.7
+  value = sliderElement.slider("value")
+  # start the slide
+  slideStart(value)
+
+  delta = -oe.wheelDelta  if oe.wheelDelta
+  delta = oe.detail * 40  if oe.detail
+  value = if delta > 0 then value + 1 else value - 1
+  
+
+  result = sliderElement.slider("option", "slide").call(sliderElement, e,
+    value: value
+  )
+  sliderElement.slider "value", value  if result isnt false
+  slideStop(value)
+
+  false
+
+
