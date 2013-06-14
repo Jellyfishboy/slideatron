@@ -57,9 +57,8 @@ init = ->
     images[i].src = src
     images[i].onload = ->
       imagesLoaded++
-      # TODO: Put a nicer preloader in here
       if imagesLoaded == imageSources.length
-        draw()
+        $('#swoop_loader').fadeTo "normal", 0
         log "loaded"
     totalimages = imageSources.length
 
@@ -191,8 +190,21 @@ drawLines = (lineArray) ->
 
   return
 
+positionLoader = ->
+  $loader = $('#loader_wrapper')
+  content_height = $('#content').height()
+  content_width = $('#content').width()
+  loader_width = $loader.width()
+  loader_height = $loader.height()
+  # Set the top position of the loader
+  loader_top = (content_height-loader_height)/2
+  $loader.css 'top', loader_top
+  # Set the left position of the loader
+  loader_left = (content_width-loader_width)/2
+  $loader.css 'left', loader_left
 
 $(window).load ->
   init()
   drawLines(lines)
+  positionLoader()
   return
