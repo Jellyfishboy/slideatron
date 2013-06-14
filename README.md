@@ -13,6 +13,7 @@ Flashcanvas needs to be run off a server. You can set up a node server pretty qu
 To do
 =====
 
+- Fix wrong image bug when snapping to breakpoint
 - Scroll wheel/trackpad events
 - Mobile swipe between breakpoints
 - Pulsating slider indicators
