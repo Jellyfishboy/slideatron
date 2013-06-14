@@ -8,7 +8,7 @@ context = null
 totalimages = null
 current_snap = null
 
-init = ->
+init = (lineArray)->
   Canvas = document.getElementById 'myCanvas'
   context = Canvas.getContext '2d'
   images = []
@@ -58,7 +58,8 @@ init = ->
     images[i].onload = ->
       imagesLoaded++
       if imagesLoaded == imageSources.length
-        $('#swoop_loader').fadeTo "normal", 0
+        $('#loader_wrapper').fadeTo "normal", 0
+        draw()
         log "loaded"
     totalimages = imageSources.length
 
@@ -69,7 +70,7 @@ init = ->
 
   # Make the slider
   $('.slider').slider({
-    value: 0
+    value: 0  
     min: 0
     max: images.length
     step: 1
@@ -81,12 +82,8 @@ init = ->
       $('.old_value').html current_snap
       $('.value').html ui.value
       new_snap = $('.value').text()
-      # highlighting indicators logic
-      if ($('.indicate').hasClass 'indicator-' + ui.value)
-        $('.indicate').removeClass "indicate_selected"
-        $('.indicator-' + ui.value).addClass "indicate_selected"
-      else
-        $('.indicate').removeClass "indicate_selected"
+      # Call to update the slider indicators
+      updateIndicators(ui.value)
       #if slider is moved forwards
       if (new_snap-current_snap > 1)
         #total number of images to cycle through during transition
@@ -128,6 +125,23 @@ init = ->
         updateCanvas images[ui.value]
       return
     stop: (event, ui) ->
+      # Uses the passed in lineArray and loops through each of the frame attributes in the line object
+      for lineData in lineArray
+        # Checks if the current slider value is one before any frame attribute in the array
+        lesser_frame = parseInt lineData.frame-1
+        greater_frame = parseInt lineData.frame+1
+        val = parseInt $('.old_value').text()
+        # If slider value before the action was initiated is between greater and less frame object, then ignore the snapping functionality
+        unless between(val, lesser_frame, greater_frame)
+          if between(ui.value, lesser_frame, lineData.frame) 
+            ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
+          # Else checks if the current slider value is one after any frame attribute in the array
+          else if between(ui.value, lineData.frame, greater_frame)
+            ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
+
+      # Call to update the slider indicators
+      updateIndicators(ui.value)
+
       # find all elements on the current frame and add a class
       $('.hedgehog-' + ui.value).addClass('active')
       $('svg.hedgehog-' + ui.value).attr("class", "hedgehog active hedgehog-" + ui.value)
@@ -190,6 +204,22 @@ drawLines = (lineArray) ->
 
   return
 
+# Update values upon snapping
+snappingBreakingpoints = (ui, frameValue, parameter) ->
+  $('.slider').slider "value", frameValue
+  $('.old_value').html parameter
+  $('.value').html frameValue
+  ui = frameValue
+  return ui
+
+updateIndicators = (ui) ->
+  # highlighting indicators logic
+  if ($('.indicate').hasClass 'indicator-' + ui)
+    $('.indicate').removeClass "indicate_selected"
+    $('.indicator-' + ui).addClass "indicate_selected"
+  else
+    $('.indicate').removeClass "indicate_selected"
+
 positionLoader = ->
   $loader = $('#loader_wrapper')
   content_height = $('#content').height()
@@ -203,8 +233,12 @@ positionLoader = ->
   loader_left = (content_width-loader_width)/2
   $loader.css 'left', loader_left
 
+# # Helper function
+between = (x, min, max) ->
+  return x >= min and x <= max
+
 $(window).load ->
-  init()
+  init(lines)
   drawLines(lines)
   positionLoader()
   return
