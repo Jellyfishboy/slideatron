@@ -16,13 +16,17 @@ Canvas = null
 context = null
 totalimages = null
 current_snap = null
+images = []
 
+<<<<<<< HEAD
 
 
 init = ->
+=======
+init = (lineArray)->
+>>>>>>> upstream/master
   Canvas = document.getElementById 'myCanvas'
   context = Canvas.getContext '2d'
-  images = []
   
   # Image array - This will be written to the head by sitecore
   imageSources = [
@@ -68,10 +72,10 @@ init = ->
     images[i].src = src
     images[i].onload = ->
       imagesLoaded++
-      # TODO: Put a nicer preloader in here
       if imagesLoaded == imageSources.length
+        $('#loader_wrapper').fadeTo "normal", 0
         draw()
-        log "loaded"
+        log "COMPLETE: Image sources"
     totalimages = imageSources.length
 
   # Function is called once all images have been loaded in
@@ -83,7 +87,7 @@ init = ->
     Make the slider
   ###
   $('.slider').slider({
-    value: 0
+    value: 0  
     min: 0
     max: images.length
     step: 1
@@ -95,36 +99,14 @@ init = ->
       $('.old_value').html current_snap
       $('.value').html ui.value
       new_snap = $('.value').text()
-      # highlighting indicators logic
-      if ($('.indicate').hasClass 'indicator-' + ui.value)
-        $('.indicate').removeClass "indicate_selected"
-        $('.indicator-' + ui.value).addClass "indicate_selected"
-      else
-        $('.indicate').removeClass "indicate_selected"
+      # Call to update the slider indicators
+      updateIndicators(ui.value)
       #if slider is moved forwards
       if (new_snap-current_snap > 1)
-        #total number of images to cycle through during transition
-        total_img = new_snap-current_snap
-        #current image before the animation begins
-        current_img = current_snap
-        #start the loop
-        loop_img = 1
-        #set intervl between each image iteration
-        forward_intv = setInterval(->
-          #increment the image array id
-          current_img++
-          #if current loop count is less or equal to total number of image to cycle through
-          if loop_img <= total_img
-            #update canvas with current image
-            updateCanvas images[current_img]
-            # log "Image " + current_img
-            #increment loop count
-            loop_img++
-          else
-            clearInterval(forward_intv)
-        , 50)
+        imageCycle(new_snap, current_snap, 1, "increment")
       #if slider is moved backwards
       else if (new_snap-current_snap < -1)
+<<<<<<< HEAD
         total_img = new_snap-current_snap
         current_img = current_snap
         loop_img = -1
@@ -137,12 +119,41 @@ init = ->
           else
             clearInterval(reverse_intv)
         , 50)
+=======
+        imageCycle(new_snap, current_snap, -1, "decrement")
+>>>>>>> upstream/master
       #if slide value is only 1, execute a single image change
       else
         updateCanvas images[ui.value]
       return
     stop: (event, ui) ->
+<<<<<<< HEAD
       slideStop(ui.value)
+=======
+      # Uses the passed in lineArray and loops through each of the frame attributes in the line object
+      for lineData in lineArray
+        # Checks if the current slider value is one before any frame attribute in the array
+        lesser_frame = parseInt lineData.frame-1
+        greater_frame = parseInt lineData.frame+1
+        val = parseInt $('.old_value').text()
+        # If slider value before the action was initiated is between greater and less frame object, then ignore the snapping functionality
+        unless between(val, lesser_frame, greater_frame)
+          if between(ui.value, lesser_frame, lineData.frame) 
+            ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
+          # Else checks if the current slider value is one after any frame attribute in the array
+          else if between(ui.value, lineData.frame, greater_frame)
+            ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
+
+      # Call to update the slider indicators
+      updateIndicators(ui.value)
+
+      # find all elements on the current frame and add a class
+      $('.hedgehog-' + ui.value).addClass('active')
+      $('svg.hedgehog-' + ui.value).attr("class", "hedgehog active hedgehog-" + ui.value)
+      #for old IE
+      $('.hedgehog-' + ui.value + " .rvml").show()
+      # If using vml we have to be a bit more hardcore and target the rvml elements
+>>>>>>> upstream/master
       return
     start: (event, ui) ->
       slideStart(ui.value)
@@ -239,3 +250,75 @@ $("#content").bind "mousewheel DOMMouseScroll", (e) ->
   false
 
 
+# Cycle through images when you click along the slider
+imageCycle = (new_snap, current_snap, loop_img, operator) ->
+  #total number of images to cycle through during transition
+  total_img = new_snap-current_snap
+  #current image before the animation begins
+  current_img = current_snap
+  
+  if operator is "increment"
+    #set intervl between each image iteration
+    forward_intv = setInterval(->
+      current_img++
+      #if current loop count is less or equal to total number of image to cycle through
+      if loop_img <= total_img
+        #update canvas with current image
+        updateCanvas images[current_img]
+        #increment loop count
+        loop_img++
+      else
+        clearInterval(forward_intv)
+    , 50)
+  else 
+    #set intervl between each image iteration
+    reverse_intv = setInterval(->
+      current_img--
+      #if current loop count is more or equal to total number of image to cycle through
+      if loop_img >= total_img
+        #update canvas with current image
+        updateCanvas images[current_img]
+        #decrement loop count
+        loop_img--
+      else
+        clearInterval(reverse_intv)
+    , 50)
+
+# Update values upon snapping
+snappingBreakingpoints = (ui, frame_value, parameter) ->
+  $('.slider').slider "value", frame_value
+  $('.old_value').html parameter
+  $('.value').html frame_value
+  ui = frame_value
+  return ui
+
+# highlighting indicators logic
+updateIndicators = (ui) ->
+  if ($('.indicate').hasClass 'indicator-' + ui)
+    $('.indicate').removeClass "indicate_selected"
+    $('.indicator-' + ui).addClass "indicate_selected"
+  else
+    $('.indicate').removeClass "indicate_selected"
+
+positionLoader = ->
+  $loader = $('#loader_wrapper')
+  content_height = $('#content').height()
+  content_width = $('#content').width()
+  loader_width = $loader.width()
+  loader_height = $loader.height()
+  # Set the top position of the loader
+  loader_top = (content_height-loader_height)/2
+  $loader.css 'top', loader_top
+  # Set the left position of the loader
+  loader_left = (content_width-loader_width)/2
+  $loader.css 'left', loader_left
+
+# # Helper function
+between = (x, min, max) ->
+  return x >= min and x <= max
+
+$(window).load ->
+  init(lines)
+  drawLines(lines)
+  positionLoader()
+  return
