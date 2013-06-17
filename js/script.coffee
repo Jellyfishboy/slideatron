@@ -60,7 +60,7 @@ init = (lineArray)->
   ]
 
 
-  ### Load the images in to memory ###
+  # Load the images in to memory
   imagesLoaded = 0
   _loaded = false
   for src, i in imageSources
@@ -76,7 +76,7 @@ init = (lineArray)->
 
   # Function is called once all images have been loaded in
   draw = ->
-    updateCanvas(images[0])
+    updateCanvas images[0]
     return
 
   ### 
@@ -109,19 +109,19 @@ init = (lineArray)->
       return
     stop: (event, ui) ->
       slideStop(ui.value)
-      # Uses the passed in lineArray and loops through each of the frame attributes in the line object
-      for lineData in lineArray
-        # Checks if the current slider value is one before any frame attribute in the array
-        lesser_frame = parseInt lineData.frame-1
-        greater_frame = parseInt lineData.frame+1
-        val = parseInt $('.old_value').text()
-        # If slider value before the action was initiated is between greater and less frame object, then ignore the snapping functionality
-        unless between(val, lesser_frame, greater_frame)
-          if between(ui.value, lesser_frame, lineData.frame) 
-            ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
-          # Else checks if the current slider value is one after any frame attribute in the array
-          else if between(ui.value, lineData.frame, greater_frame)
-            ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
+      # # Uses the passed in lineArray and loops through each of the frame attributes in the line object
+      # for lineData in lineArray
+      #   # Checks if the current slider value is one before any frame attribute in the array
+      #   lesser_frame = parseInt lineData.frame-1
+      #   greater_frame = parseInt lineData.frame+1
+      #   val = parseInt $('.old_value').text()
+      #   # If slider value before the action was initiated is between greater and less frame object, then ignore the snapping functionality
+      #   unless between(val, lesser_frame, greater_frame)
+      #     if between(ui.value, lesser_frame, lineData.frame) 
+      #       ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
+      #     # Else checks if the current slider value is one after any frame attribute in the array
+      #     else if between(ui.value, lineData.frame, greater_frame)
+      #       ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
 
       # Call to update the slider indicators
       updateIndicators(ui.value)
@@ -136,8 +136,7 @@ init = (lineArray)->
     start: (event, ui) ->
       slideStart(ui.value)
       return
-  })
-     
+  })       
   return
 
 slideStart = (value) ->
@@ -156,7 +155,7 @@ slideStop = (value) ->
   $('.hedgehog-' + value + " .rvml").show()
   return
 
-## function takes an image and prints it to the canvas
+# function takes an image and prints it to the canvas
 updateCanvas = (ImgObj) ->
   if typeof ImgObj isnt 'undefined'
     context.drawImage ImgObj, 0,0, 500, 500
@@ -263,12 +262,12 @@ imageCycle = (new_snap, current_snap, loop_img, operator) ->
     , 50)
 
 # Update values upon snapping
-snappingBreakingpoints = (ui, frame_value, parameter) ->
-  $('.slider').slider "value", frame_value
-  $('.old_value').html parameter
-  $('.value').html frame_value
-  ui = frame_value
-  return ui
+# snappingBreakingpoints = (ui, frame_value, parameter) ->
+#   $('.slider').slider "value", frame_value
+#   $('.old_value').html parameter
+#   $('.value').html frame_value
+#   ui = frame_value
+#   return ui
 
 # highlighting indicators logic
 updateIndicators = (ui) ->
