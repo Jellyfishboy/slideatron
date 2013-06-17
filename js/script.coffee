@@ -18,13 +18,9 @@ totalimages = null
 current_snap = null
 images = []
 
-<<<<<<< HEAD
 
 
-init = ->
-=======
 init = (lineArray)->
->>>>>>> upstream/master
   Canvas = document.getElementById 'myCanvas'
   context = Canvas.getContext '2d'
   
@@ -87,7 +83,7 @@ init = (lineArray)->
     Make the slider
   ###
   $('.slider').slider({
-    value: 0  
+    value: 0
     min: 0
     max: images.length
     step: 1
@@ -106,30 +102,13 @@ init = (lineArray)->
         imageCycle(new_snap, current_snap, 1, "increment")
       #if slider is moved backwards
       else if (new_snap-current_snap < -1)
-<<<<<<< HEAD
-        total_img = new_snap-current_snap
-        current_img = current_snap
-        loop_img = -1
-        reverse_intv = setInterval(->
-          current_img--
-          if loop_img >= total_img
-            updateCanvas images[current_img]
-            # log "Image " + current_img
-            loop_img--
-          else
-            clearInterval(reverse_intv)
-        , 50)
-=======
         imageCycle(new_snap, current_snap, -1, "decrement")
->>>>>>> upstream/master
       #if slide value is only 1, execute a single image change
       else
         updateCanvas images[ui.value]
       return
     stop: (event, ui) ->
-<<<<<<< HEAD
       slideStop(ui.value)
-=======
       # Uses the passed in lineArray and loops through each of the frame attributes in the line object
       for lineData in lineArray
         # Checks if the current slider value is one before any frame attribute in the array
@@ -153,7 +132,6 @@ init = (lineArray)->
       #for old IE
       $('.hedgehog-' + ui.value + " .rvml").show()
       # If using vml we have to be a bit more hardcore and target the rvml elements
->>>>>>> upstream/master
       return
     start: (event, ui) ->
       slideStart(ui.value)
