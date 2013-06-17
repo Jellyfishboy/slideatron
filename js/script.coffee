@@ -1,14 +1,47 @@
 $ = jQuery
 log = (message) ->
-  if typeof(console) is 'object' then console.log(message) else return null
-
+  if typeof console is 'object' then console.log(message) else return null
 ###
 # Lets start this up
 ###
+$(document).ready ->
+  # Set google analytics object
+  gaEnabled = if typeof _gaq is 'object' then true else false
+  window.SwoopGAData = new SwoopAnalyticsData gaEnabled
+  return
+
 $(window).load ->
   init()
   drawLines(lines)
+  positionLoader()
+  CTA_buttons()
   return
+
+class SwoopAnalyticsData
+
+  constructor: (@enabled) ->
+    @send()
+
+  event: "snap"
+
+  build: (breakpoints_array) ->
+    if breakpoints_array isnt undefined
+      @identifier = breakpoints_array[1]
+      if breakpoints_array[0] isnt "CTA"
+        @event = "click"       
+        @category = 'swoop-breakpoints'
+      else
+        @event = "CTA"
+        @category = 'swoop-call-to-action'
+        
+    return ['_trackEvent', @category, @event, @identifier]
+
+
+  send: (breakpoints_array) ->
+    if @enabled
+      log breakpoints_array
+      _gaq.push(@build(breakpoints_array))
+    return
 
 
 # Keep these as somewhat global
@@ -20,7 +53,7 @@ images = []
 
 
 
-init = (lineArray)->
+init = (lineArray) ->
   Canvas = document.getElementById 'myCanvas'
   context = Canvas.getContext '2d'
   
@@ -268,12 +301,17 @@ imageCycle = (new_snap, current_snap, loop_img, operator) ->
 #   $('.value').html frame_value
 #   ui = frame_value
 #   return ui
+CTA_buttons = ->
+  $('.hedgehog button').click ->
+    tracker_tag = $(@).attr 'data-tracking'
+    SwoopGAData.send(["CTA", tracker_tag])
 
 # highlighting indicators logic
 updateIndicators = (ui) ->
   if ($('.indicate').hasClass 'indicator-' + ui)
     $('.indicate').removeClass "indicate_selected"
     $('.indicator-' + ui).addClass "indicate_selected"
+    SwoopGAData.send(["click", "breakpoint-"+ui])
   else
     $('.indicate').removeClass "indicate_selected"
 
@@ -293,9 +331,3 @@ positionLoader = ->
 # # Helper function
 between = (x, min, max) ->
   return x >= min and x <= max
-
-$(window).load ->
-  init(lines)
-  drawLines(lines)
-  positionLoader()
-  return

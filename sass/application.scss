@@ -12,13 +12,14 @@
 		@include transition-property(opacity);
 		@include transition-duration(1s);
 		@include transition-timing-function(ease-in);
+    z-index:9;
 	}
 	.locale-7 {
 		top:30px;
 	}
 	.locale-11 {
-		bottom:30px;
-		right:0px;
+		bottom:125px;
+		right:-20px;
 	}
 
   #myCanvas {
@@ -32,6 +33,9 @@
     position: relative;
     width:500px;
     height:500px;
+      svg {
+        z-index:1;
+      }
   }
 
   .active {
@@ -60,6 +64,10 @@
   }
   .indicate_selected {
   	@include opacity(1);
+  }
+  .slider {
+    position:absolute;
+    z-index:10;
   }
   #loader_wrapper {
     position:absolute;
