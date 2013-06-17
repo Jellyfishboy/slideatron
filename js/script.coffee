@@ -17,7 +17,8 @@ context = null
 totalimages = null
 current_snap = null
 
-# If there's desire to have multiple swoop arounds, this will have to be refactored for 'each'
+
+
 init = ->
   Canvas = document.getElementById 'myCanvas'
   context = Canvas.getContext '2d'
