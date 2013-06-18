@@ -337,13 +337,10 @@ nextBreakpoint = (lineArray) ->
   if cap < lineArray.length
     breakCounter++
     previous_snap = $('.value').text()
+    secondary_previous_snap = $('.secondary_value').text()
     $('.old_value').html previous_snap
     $('.secondary_old_value').html previous_snap
-    current_snap = lineArray[breakCounter].frame
-    $('.value').html current_snap
-    $('.secondary_value').html current_snap
-    imageCycle(current_snap, previous_snap, 1, "increment")
-    $('.slider').slider "value", current_snap
+    updateSwipe(lineArray, previous_snap)
 
 # Previous breakpoint (mobile/scroll only)
 previousBreakpoint = (lineArray) -> 
@@ -351,36 +348,33 @@ previousBreakpoint = (lineArray) ->
   secondary_previous_snap = $('.secondary_value').text()
   $('.old_value').html previous_snap
   $('.secondary_old_value').html secondary_previous_snap
-  current_snap = $('.secondary_value').text()
+  current_snap = $('.value').text()
   for lineData in lineArray   
     if breakCounter is -1
       $('.value').html "0"
       $('.secondary_value').html "0"
       imageCycle(0, previous_snap, -1, "decrement")
       $('.slider').slider "value", 0  
-      log "frame + 0"
-    else if current_snap is lineData.frame and breakCounter is 0
+    else if parseInt(current_snap) is lineData.frame and breakCounter is 0
       breakCounter--
       $('.value').html "0"
       $('.secondary_value').html "0"
       imageCycle(0, previous_snap, -1, "decrement")
       $('.slider').slider "value", 0  
-      log "frame + 0"
-    else if current_snap is lineData.frame
+    else if parseInt(current_snap) is lineData.frame
       breakCounter--
-      current_snap = lineArray[breakCounter].frame
-      $('.value').html current_snap
-      $('.secondary_value').html current_snap
-      imageCycle(current_snap, previous_snap, -1, "decrement")
-      $('.slider').slider "value", current_snap
-      log "frame"
-    else 
-      current_snap = lineArray[breakCounter].frame
-      $('.value').html current_snap
-      $('.secondary_value').html current_snap
-      imageCycle(current_snap, previous_snap, -1, "decrement")
-      $('.slider').slider "value", current_snap
-      log "no mans land"
+      updateSwipe(lineArray, previous_snap)
+    else if breakCounter is lineArray.length-1
+      updateSwipe(lineArray, previous_snap)
+    else
+      updateSwipe(lineArray, previous_snap)
 # Helper function
 between = (x, min, max) ->
   return x >= min and x <= max
+
+updateSwipe = (lineArray, previous) ->
+  current_snap = lineArray[breakCounter].frame
+  $('.value').html current_snap
+  $('.secondary_value').html current_snap
+  imageCycle(current_snap, previous, -1, "decrement")
+  $('.slider').slider "value", current_snap
