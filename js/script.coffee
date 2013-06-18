@@ -1,9 +1,11 @@
 $ = jQuery
+
+#####################################
+#    Check if console exists (IE)   #
+#####################################
 log = (message) ->
   if typeof console is 'object' then console.log(message) else return null
-###
-# Lets start this up
-###
+
 $(document).ready ->
   # Set google analytics object
   gaEnabled = if typeof _gaq is 'object' then true else false
@@ -21,14 +23,16 @@ $(window).load ->
     previousBreakpoint(lines)
   return
 
-# Keep these as somewhat global
+#####################################
+#             Variables             #
+#####################################
 Canvas = null
 context = null
 totalimages = null
 previous_snap = null
 images = []
-window.breakCounter = -1
-window.lines = [
+breakCounter = -1
+lines = [
   line1 = {
     frame: 14
     path: "M100,120L100,250L150,250"
@@ -38,33 +42,12 @@ window.lines = [
     path: "M250,450L200,400L200,350"
   }
 ]
-window.current_snap = undefined
-
-class SwoopAnalyticsData
-
-  constructor: (@enabled) ->
-    @send()
-
-  event: "snap"
-
-  build: (breakpoints_array) ->
-    if breakpoints_array isnt undefined
-      @identifier = breakpoints_array[1]
-      if breakpoints_array[0] isnt "CTA"
-        @event = "click"       
-        @category = 'swoop-breakpoints'
-      else
-        @event = "CTA"
-        @category = 'swoop-call-to-action'
-        
-    return ['_trackEvent', @category, @event, @identifier]
-
-
-  send: (breakpoints_array) ->
-    if @enabled
-      log breakpoints_array
-      _gaq.push(@build(breakpoints_array))
-    return
+# Setup slide frame object for current and previous frames when using the slider
+window.slideFrame = new Object()
+slideFrame.previous = 0
+slideFrame.current = 0
+slideFrame.swipe_previous = 0
+slideFrame.swipe_current = 0
 
 init = (lineArray) ->
   Canvas = document.getElementById 'myCanvas'
@@ -125,9 +108,9 @@ init = (lineArray) ->
     updateCanvas images[0]
     return
 
-  ### 
-    Make the slider
-  ###
+  #####################################
+  #        Initiate the slider        #
+  #####################################
   $('.slider').slider({
     value: 0
     min: 0
@@ -136,19 +119,17 @@ init = (lineArray) ->
     animate: true
 
     slide: (event, ui) ->
-      # on slide event...     
-      #appends old value element with current snap
-      previous_snap = $('.value').text()
-      $('.old_value').html previous_snap
-      $('.value').html ui.value
-      current_snap = $('.value').text()
+      # on slide event...
+      # Sets the previous slide fram value before it updates the current slide frame with the slider ui value
+      slideFrame.previous = slideFrame.current
+      slideFrame.current = ui.value
       updateIndicators ui.value
       #if slider is moved forwards
-      if (current_snap-previous_snap > 1)
-        imageCycle current_snap, previous_snap, 1, "increment"
+      if slideFrame.current-slideFrame.previous > 1
+        imageCycle slideFrame.current, slideFrame.previous, 1, "increment"
       #if slider is moved backwards
-      else if (current_snap-previous_snap < -1)
-        imageCycle current_snap, previous_snap, -1, "decrement"
+      else if slideFrame.current-slideFrame.previous < -1
+        imageCycle slideFrame.current, slideFrame.previous, -1, "decrement"
       #if slide value is only 1, execute a single image change
       else
         updateCanvas images[ui.value]
@@ -156,22 +137,24 @@ init = (lineArray) ->
 
     stop: (event, ui) ->
       # Need to setup unique current and previous snap values as the initial values are recorded in real time when using the slide function above. This creates an inaccurate increment/decrement function. 
-      secondary_previous_snap = $('.secondary_value').text()
-      $('.secondary_old_value').html secondary_previous_snap
-      $('.secondary_value').html ui.value
-      secondary_current_snap = $('.secondary_value').text() 
+      slideFrame.swipe_previous = slideFrame.swipe_current
+      slideFrame.swipe_current = ui.value
       for lineData in lineArray
+        # Determines whether the next frame which the user slides to has originated from before a breakpoint and lands after a breakpoint, in order to calculate the new breakCounter value
         if ui.value > lineData.frame-1 and secondary_previous_snap < lineData.frame
           breakCounter++
         else if ui.value < lineData.frame and secondary_previous_snap > lineData.frame-1
           breakCounter--
+      # Update the relevant elements
       updateElements ui.value
       return
     start: (event, ui) ->
+      # Hide the relevant elements
       hideElements ui.value
   })       
   return
 
+# Function to hide the redundant elements for the specified breakpoint
 hideElements = (value) ->
   $('#content .active').removeClass 'active'
   # removeClass doesn't work on svgs, have to do it by hand
@@ -179,6 +162,7 @@ hideElements = (value) ->
   $('.hedgehog .rvml').hide()
   return
 
+# Updates the elements for the specified breakpoint
 updateElements = (value) ->
   # find all elements on the current frame and add a class
   $('.hedgehog-' + value).addClass 'active'
@@ -190,15 +174,15 @@ updateElements = (value) ->
   updateIndicators value
   return
 
-# function takes an image and prints it to the canvas
+# Takes the passed in image object, and prints it to the canvas
 updateCanvas = (ImgObj) ->
   if typeof ImgObj isnt 'undefined'
     context.drawImage ImgObj, 0,0, 500, 500
   return
 
+# Draw the SVG lines
 drawLines = (lineArray) ->
   # make the paper for which to draw the lines on
-
   for lineData in lineArray
     # have to define an individual canvas for each set of lines as you can't apply classes to vml shapes
     paper = Raphael $(".lines")[0], 500, 500
@@ -206,7 +190,7 @@ drawLines = (lineArray) ->
     $(paper.canvas).attr "class", "hedgehog hedgehog-" + lineData.frame
     line = paper.path lineData.path
 
-    # Setting up indicator element to be generated for each snap point dynamically
+    # Setting up indicator element to be generated for each breakpoint dynamically
     slider_width = $('.ui-slider').outerWidth()
     indicator_loc = slider_width/totalimages*lineData.frame
     # compensate for the size of the dot
@@ -223,9 +207,9 @@ drawLines = (lineArray) ->
 
   return
 
-###
-#  Mousewheel bindin'
-###
+#####################################
+#         Mousewheel binding        #
+#####################################
 $("#content").bind "mousewheel DOMMouseScroll", (e) ->
 
   delta = 0
@@ -283,12 +267,13 @@ imageCycle = (current_snap, previous_snap, loop_img, operator) ->
         clearInterval(reverse_intv)
     , 50)
 
+# Attach google analytics trigger to any call to action buttons within the hedgehogs
 CTA_buttons = ->
   $('.hedgehog button').click ->
     tracker_tag = $(@).attr 'data-tracking'
     SwoopGAData.send ["CTA", tracker_tag]
 
-# highlighting indicators logic
+# Highlight indicator when the user lands on the relevant breakpoint
 updateIndicators = (ui) ->
   if ($('.indicate').hasClass 'indicator-' + ui)
     $('.indicate').removeClass "indicate_selected"
@@ -297,6 +282,7 @@ updateIndicators = (ui) ->
   else
     $('.indicate').removeClass "indicate_selected"
 
+# Position the CSS3 loading animation
 positionLoader = ->
   $loader = $('#loader_wrapper')
   content_height = $('#content').height()
@@ -368,6 +354,36 @@ updateForwardSwipe = (lineArray, previous) ->
   imageCycle current_snap, previous, 1, "increment"
   $('.slider').slider "value", current_snap
 
-# Helper function
+# Calculate when a value lies between two specified values
 between = (x, min, max) ->
   return x >= min and x <= max
+
+# Class for Google analytics integration
+class SwoopAnalyticsData
+
+  # Assemble the constructor
+  constructor: (@enabled) ->
+    @send()
+
+  # Default the event to 'snap'
+  event: "snap"
+
+  # Build the array to be pushed to the _gaq object
+  build: (breakpoints_array) ->
+    if breakpoints_array isnt undefined
+      @identifier = breakpoints_array[1]
+      if breakpoints_array[0] isnt "CTA"
+        @event = "click"       
+        @category = 'swoop-breakpoints'
+      else
+        @event = "CTA"
+        @category = 'swoop-call-to-action'
+        
+    return ['_trackEvent', @category, @event, @identifier]
+
+  # Push the array built above into the _gaq object
+  send: (breakpoints_array) ->
+    if @enabled
+      log breakpoints_array
+      _gaq.push(@build(breakpoints_array))
+    return
