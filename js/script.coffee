@@ -38,7 +38,6 @@ window.lines = [
     path: "M250,450L200,400L200,350"
   }
 ]
-window.previous_snap = undefined
 window.current_snap = undefined
 
 class SwoopAnalyticsData
@@ -136,12 +135,6 @@ init = (lineArray) ->
     step: 1
     animate: true
 
-    create: (event, ui) ->
-      previous_snap = $('.value').text()
-      $('.old_value').html previous_snap
-      $('.value').html ui.value
-      current_snap = $('.value').text()
-
     slide: (event, ui) ->
       # on slide event...     
       #appends old value element with current snap
@@ -153,50 +146,25 @@ init = (lineArray) ->
       #if slider is moved forwards
       if (current_snap-previous_snap > 1)
         imageCycle(current_snap, previous_snap, 1, "increment")
-        for lineData in lineArray
-          if ui.value >= lineData.frame and previous_snap <= lineData.frame
-            breakCounter++
-            log "break++"
       #if slider is moved backwards
       else if (current_snap-previous_snap < -1)
         imageCycle(current_snap, previous_snap, -1, "decrement")
       #if slide value is only 1, execute a single image change
-        for lineData in lineArray
-          if ui.value <= lineData.frame and previous_snap >= lineData.frame
-            breakCounter--
-            log "break--"
       else
         updateCanvas images[ui.value]
       return
-    #
-    change: (event, ui) ->
-      # Call to update the slider indicators
-      previous_snap = $('.value').text()
-      $('.old_value').html previous_snap
-      $('.value').html ui.value
-      current_snap = $('.value').text()
-      updateIndicators(ui.value)
-      #if slider is moved forwards
-      if (current_snap-previous_snap > 1)
-        for lineData in lineArray
-          if ui.value >= lineData.frame and previous_snap <= lineData.frame
-            breakCounter++
-            log "break++"
-      #if slider is moved backwards
-      else if (current_snap-previous_snap < -1)
-      #if slide value is only 1, execute a single image change
-        for lineData in lineArray
-          if ui.value <= lineData.frame and previous_snap >= lineData.frame
-            breakCounter--
-            log "break--"
-      return
-
-
 
     stop: (event, ui) ->
-      slideStop(ui.value)
-      # Call to update the slider indicators
-      updateIndicators(ui.value)
+      # Need to setup unique current and previous snap values as the initial values are recorded in real time when using the slide function above. This creates an inaccurate increment/decrement function. 
+      secondary_previous_snap = $('.secondary_value').text()
+      $('.secondary_old_value').html secondary_previous_snap
+      $('.secondary_value').html ui.value
+      secondary_current_snap = $('.secondary_value').text() 
+      for lineData in lineArray
+        if ui.value > lineData.frame-1 and secondary_previous_snap < lineData.frame
+          breakCounter++
+        else if ui.value < lineData.frame and secondary_previous_snap > lineData.frame-1
+          breakCounter--
       # # Uses the passed in lineArray and loops through each of the frame attributes in the line object
       # for lineData in lineArray
       #   # Checks if the current slider value is one before any frame attribute in the array
@@ -210,6 +178,7 @@ init = (lineArray) ->
       #     # Else checks if the current slider value is one after any frame attribute in the array
       #     else if between(ui.value, lineData.frame, greater_frame)
       #       ui.value = snappingBreakingpoints(ui.value, lineData.frame, lesser_frame)
+      slideStop(ui.value)
       return
     start: (event, ui) ->
       slideStart(ui.value)
@@ -231,6 +200,8 @@ slideStop = (value) ->
   #for old IE
   # If using vml we have to be a bit more hardcore and target the rvml elements
   $('.hedgehog-' + value + " .rvml").show()
+  # Call to update the slider indicators
+  updateIndicators(value)
   return
 
 # function takes an image and prints it to the canvas
@@ -361,33 +332,55 @@ positionLoader = ->
   $loader.css 'left', loader_left
 
 # Next breakpoint (mobile/scroll only)
-nextBreakpoint = (linesArray) ->
-  breakCounter++
-  log breakCounter
-  previous_snap = $('.value').text()
-  $('.old_value').html previous_snap
-  current_snap = linesArray[breakCounter].frame
-  $('.value').html current_snap
-  imageCycle(current_snap, previous_snap, 1, "increment")
-  $('.slider').slider "value", current_snap
-
-# Previous breakpoint (mobile/scroll only)
-previousBreakpoint = (linesArray) -> 
-  previous_snap = $('.value').text()
-  $('.old_value').html previous_snap
-  if breakCounter is 0 
-    $('.value').html "0"
-    imageCycle(0, previous_snap, -1, "decrement")
-    $('.slider').slider "value", 0
-    breakCounter--
-  else
-    breakCounter--
-    log breakCounter
-    current_snap = linesArray[breakCounter].frame
+nextBreakpoint = (lineArray) ->
+  cap = breakCounter+1
+  if cap < lineArray.length
+    breakCounter++
+    previous_snap = $('.value').text()
+    $('.old_value').html previous_snap
+    $('.secondary_old_value').html previous_snap
+    current_snap = lineArray[breakCounter].frame
     $('.value').html current_snap
-    imageCycle(current_snap, previous_snap, -1, "decrement")
+    $('.secondary_value').html current_snap
+    imageCycle(current_snap, previous_snap, 1, "increment")
     $('.slider').slider "value", current_snap
 
+# Previous breakpoint (mobile/scroll only)
+previousBreakpoint = (lineArray) -> 
+  previous_snap = $('.value').text()
+  secondary_previous_snap = $('.secondary_value').text()
+  $('.old_value').html previous_snap
+  $('.secondary_old_value').html secondary_previous_snap
+  current_snap = $('.secondary_value').text()
+  for lineData in lineArray   
+    if breakCounter is -1
+      $('.value').html "0"
+      $('.secondary_value').html "0"
+      imageCycle(0, previous_snap, -1, "decrement")
+      $('.slider').slider "value", 0  
+      log "frame + 0"
+    else if current_snap is lineData.frame and breakCounter is 0
+      breakCounter--
+      $('.value').html "0"
+      $('.secondary_value').html "0"
+      imageCycle(0, previous_snap, -1, "decrement")
+      $('.slider').slider "value", 0  
+      log "frame + 0"
+    else if current_snap is lineData.frame
+      breakCounter--
+      current_snap = lineArray[breakCounter].frame
+      $('.value').html current_snap
+      $('.secondary_value').html current_snap
+      imageCycle(current_snap, previous_snap, -1, "decrement")
+      $('.slider').slider "value", current_snap
+      log "frame"
+    else 
+      current_snap = lineArray[breakCounter].frame
+      $('.value').html current_snap
+      $('.secondary_value').html current_snap
+      imageCycle(current_snap, previous_snap, -1, "decrement")
+      $('.slider').slider "value", current_snap
+      log "no mans land"
 # Helper function
 between = (x, min, max) ->
   return x >= min and x <= max
