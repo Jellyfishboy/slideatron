@@ -304,17 +304,23 @@ previousBreakpoint = (lineArray) ->
       slideFrame.swipe_current = 0
       imageCycle(0, slideFrame.previous, -1, "decrement")
       $('.slider').slider "value", 0  
-    else if parseInt(slideFrame.current) is lineData.frame
+    # Required to use slideFrame.swipe_current to prevent secondary evaluation
+    else if parseInt(slideFrame.swipe_current) is lineData.frame
       breakCounter--
       updateBackwardSwipe lineArray, slideFrame.previous
     else if breakCounter is lineArray.length-1
       updateBackwardSwipe lineArray, slideFrame.previous
     else
+  # The slideFrame.current variable is updated with the new lineData.frame value before it reaches the second iteration of the if statement. This results in the second if iteration to evaluate a second argument, as detailed above, because the slideFrame object is global. By uisng the slideFrame.swipe_current value and only updating the value after the for loop, enables us to evaluate only one argument in the statement.
+  # Also check if breakcounter is less than 0, set swipe_current value to 0 (frame)
+  if breakCounter is -1 
+    slideFrame.swipe_current = 0
+  else
+    slideFrame.swipe_current = lineArray[breakCounter].frame
   updateElements slideFrame.current
 
 updateBackwardSwipe = (lineArray, previous) ->
   slideFrame.current = lineArray[breakCounter].frame
-  slideFrame.swipe_current = lineArray[breakCounter].frame
   imageCycle slideFrame.current, previous, -1, "decrement"
   $('.slider').slider "value", slideFrame.current
 
@@ -355,7 +361,7 @@ class SwoopAnalyticsData
 
   # Push the array built above into the _gaq object
   send: (breakpoints_array) ->
-    if @enabled
+    if @enabled 
       log breakpoints_array
       _gaq.push(@build(breakpoints_array))
     return
