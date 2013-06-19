@@ -28,10 +28,9 @@ $(window).load ->
 #####################################
 Canvas = null
 context = null
-totalimages = null
-previous_snap = null
+total_images = null
 images = []
-breakCounter = -1
+window.breakCounter = -1
 lines = [
   line1 = {
     frame: 14
@@ -101,7 +100,7 @@ init = (lineArray) ->
         $('#loader_wrapper').fadeTo "normal", 0
         draw()
         log "COMPLETE: Image sources"
-    totalimages = imageSources.length
+    total_images = imageSources.length
 
   # Function is called once all images have been loaded in
   draw = ->
@@ -141,9 +140,9 @@ init = (lineArray) ->
       slideFrame.swipe_current = ui.value
       for lineData in lineArray
         # Determines whether the next frame which the user slides to has originated from before a breakpoint and lands after a breakpoint, in order to calculate the new breakCounter value
-        if ui.value > lineData.frame-1 and secondary_previous_snap < lineData.frame
+        if ui.value > lineData.frame-1 and slideFrame.swipe_previous < lineData.frame
           breakCounter++
-        else if ui.value < lineData.frame and secondary_previous_snap > lineData.frame-1
+        else if ui.value < lineData.frame and slideFrame.swipe_previous > lineData.frame-1
           breakCounter--
       # Update the relevant elements
       updateElements ui.value
@@ -153,6 +152,10 @@ init = (lineArray) ->
       hideElements ui.value
   })       
   return
+
+#####################################
+#             Functions             #
+#####################################
 
 # Function to hide the redundant elements for the specified breakpoint
 hideElements = (value) ->
@@ -192,7 +195,7 @@ drawLines = (lineArray) ->
 
     # Setting up indicator element to be generated for each breakpoint dynamically
     slider_width = $('.ui-slider').outerWidth()
-    indicator_loc = slider_width/totalimages*lineData.frame
+    indicator_loc = slider_width/total_images*lineData.frame
     # compensate for the size of the dot
     indicator_pos = indicator_loc-6
     indicator = "<span class='indicate indicator-" + lineData.frame + "'></span>"
@@ -207,38 +210,12 @@ drawLines = (lineArray) ->
 
   return
 
-#####################################
-#         Mousewheel binding        #
-#####################################
-$("#content").bind "mousewheel DOMMouseScroll", (e) ->
-
-  delta = 0
-  sliderElement = $(this).find '.slider'
-  oe = e.originalEvent # for jQuery >=1.7
-  value = sliderElement.slider 'value'
-  # start the slide
-  hideElements value
-
-  delta = -oe.wheelDelta  if oe.wheelDelta
-  delta = oe.detail * 40  if oe.detail
-  value = if delta > 0 then value + 1 else value - 1
-  
-
-  result = sliderElement.slider("option", "slide").call(sliderElement, e,
-    value: value
-  )
-  sliderElement.slider "value", value  if result isnt false
-  updateElements value
-
-  false
-
-
 # Cycle through images when you click along the slider
-imageCycle = (current_snap, previous_snap, loop_img, operator) ->
+imageCycle = (current, previous, loop_img, operator) ->
   #total number of images to cycle through during transition
-  total_img = current_snap-previous_snap
+  total_img = current-previous
   #current image before the animation begins
-  current_img = previous_snap
+  current_img = previous
   
   if operator is "increment"
     #set intervl between each image iteration
@@ -266,6 +243,8 @@ imageCycle = (current_snap, previous_snap, loop_img, operator) ->
       else
         clearInterval(reverse_intv)
     , 50)
+
+
 
 # Attach google analytics trigger to any call to action buttons within the hedgehogs
 CTA_buttons = ->
@@ -298,67 +277,60 @@ positionLoader = ->
 
 # Next breakpoint (mobile/scroll only)
 nextBreakpoint = (lineArray) ->
+  # Prevent the breakCounter variable counting up if there are not more items left in the 'lines' JSON object
   cap = breakCounter+1
   if cap < lineArray.length
     breakCounter++
-    previous_snap = $('.value').text()
-    secondary_previous_snap = $('.value').text()
-    $('.old_value').html previous_snap
-    $('.secondary_old_value').html previous_snap
-    current_snap = $('.value').text()
-    updateForwardSwipe lineArray, secondary_previous_snap
-  hideElements current_snap
+    slideFrame.previous = slideFrame.current
+    slideFrame.swipe_previous = slideFrame.swipe_current
+    updateForwardSwipe lineArray, slideFrame.previous
+  hideElements slideFrame.previous
   updateElements $('.slider').slider("value")
 
 # Previous breakpoint (mobile/scroll only)
 previousBreakpoint = (lineArray) -> 
-  previous_snap = $('.value').text()
-  hideElements previous_snap
-  secondary_previous_snap = $('.secondary_value').text()
-  $('.old_value').html previous_snap
-  $('.secondary_old_value').html secondary_previous_snap
-  current_snap = $('.value').text()
+  slideFrame.previous = slideFrame.current
+  slideFrame.swipe_previous = slideFrame.swipe_current
+  hideElements slideFrame.previous
   for lineData in lineArray   
     if breakCounter is -1
-      $('.value').html "0"
-      $('.secondary_value').html "0"
-      imageCycle(0, previous_snap, -1, "decrement")
+      slideFrame.current = 0
+      slideFrame.swipe_current = 0
+      imageCycle(0, slideFrame.previous, -1, "decrement")
       $('.slider').slider "value", 0  
-    else if parseInt(current_snap) is lineData.frame and breakCounter is 0
+    else if parseInt(slideFrame.current) is lineData.frame and breakCounter is 0
       breakCounter--
-      $('.value').html "0"
-      $('.secondary_value').html "0"
-      imageCycle(0, previous_snap, -1, "decrement")
+      slideFrame.current = 0
+      slideFrame.swipe_current = 0
+      imageCycle(0, slideFrame.previous, -1, "decrement")
       $('.slider').slider "value", 0  
-    else if parseInt(current_snap) is lineData.frame
+    else if parseInt(slideFrame.current) is lineData.frame
       breakCounter--
-      updateBackwardSwipe lineArray, previous_snap
+      updateBackwardSwipe lineArray, slideFrame.previous
     else if breakCounter is lineArray.length-1
-      updateBackwardSwipe lineArray, previous_snap
+      updateBackwardSwipe lineArray, slideFrame.previous
     else
-      updateBackwardSwipe lineArray, previous_snap
-  current_snap = $('.value').text()
-  updateElements current_snap
+  updateElements slideFrame.current
 
 updateBackwardSwipe = (lineArray, previous) ->
-  current_snap = lineArray[breakCounter].frame
-  $('.value').html current_snap
-  $('.secondary_value').html current_snap
-  imageCycle current_snap, previous, -1, "decrement"
-  $('.slider').slider "value", current_snap
+  slideFrame.current = lineArray[breakCounter].frame
+  slideFrame.swipe_current = lineArray[breakCounter].frame
+  imageCycle slideFrame.current, previous, -1, "decrement"
+  $('.slider').slider "value", slideFrame.current
 
 updateForwardSwipe = (lineArray, previous) ->
-  current_snap = lineArray[breakCounter].frame
-  $('.value').html current_snap
-  $('.secondary_value').html current_snap
-  imageCycle current_snap, previous, 1, "increment"
-  $('.slider').slider "value", current_snap
+  slideFrame.current = lineArray[breakCounter].frame
+  slideFrame.swipe_current = lineArray[breakCounter].frame
+  imageCycle slideFrame.current, previous, 1, "increment"
+  $('.slider').slider "value", slideFrame.current
 
 # Calculate when a value lies between two specified values
 between = (x, min, max) ->
   return x >= min and x <= max
 
-# Class for Google analytics integration
+#####################################
+#   Google analytics integration    #
+#####################################
 class SwoopAnalyticsData
 
   # Assemble the constructor
@@ -387,3 +359,28 @@ class SwoopAnalyticsData
       log breakpoints_array
       _gaq.push(@build(breakpoints_array))
     return
+
+#####################################
+#         Mousewheel binding        #
+#####################################
+$("#content").bind "mousewheel DOMMouseScroll", (e) ->
+
+  delta = 0
+  sliderElement = $(this).find '.slider'
+  oe = e.originalEvent # for jQuery >=1.7
+  value = sliderElement.slider 'value'
+  # start the slide
+  hideElements value
+
+  delta = -oe.wheelDelta  if oe.wheelDelta
+  delta = oe.detail * 40  if oe.detail
+  value = if delta > 0 then value + 1 else value - 1
+  
+
+  result = sliderElement.slider("option", "slide").call(sliderElement, e,
+    value: value
+  )
+  sliderElement.slider "value", value  if result isnt false
+  updateElements value
+
+  false
