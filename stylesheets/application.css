@@ -1,0 +1,495 @@
+/* line 2, ../sass/application.scss */
+#content {
+  margin: 0 auto;
+  position: relative;
+  width: 500px;
+  height: 600px;
+}
+/* line 7, ../sass/application.scss */
+#content .hedgehog {
+  opacity: 0;
+  position: absolute;
+  width: 250px;
+  filter: alpha(opacity=0);
+  -webkit-transition-property: opacity;
+  -moz-transition-property: opacity;
+  -o-transition-property: opacity;
+  transition-property: opacity;
+  -webkit-transition-duration: 1s;
+  -moz-transition-duration: 1s;
+  -o-transition-duration: 1s;
+  transition-duration: 1s;
+  -webkit-transition-timing-function: ease-in;
+  -moz-transition-timing-function: ease-in;
+  -o-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+  z-index: 9;
+}
+/* line 17, ../sass/application.scss */
+#content .locale-7 {
+  top: 30px;
+}
+/* line 20, ../sass/application.scss */
+#content .locale-11 {
+  bottom: 125px;
+  right: -20px;
+}
+/* line 25, ../sass/application.scss */
+#content #myCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+/* line 32, ../sass/application.scss */
+#content .lines {
+  position: relative;
+  width: 500px;
+  height: 500px;
+}
+/* line 36, ../sass/application.scss */
+#content .lines svg {
+  z-index: 1;
+}
+/* line 41, ../sass/application.scss */
+#content .active {
+  opacity: 1 !important;
+  filter: alpha(opacity=100) !important;
+}
+/* line 45, ../sass/application.scss */
+#content .indicate {
+  position: absolute;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -ms-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
+  background-color: #333333;
+  height: 10px;
+  width: 10px;
+  top: -22px;
+  cursor: pointer;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20);
+  opacity: 0.2;
+  -webkit-transition-property: opacity;
+  -moz-transition-property: opacity;
+  -o-transition-property: opacity;
+  transition-property: opacity;
+  -webkit-transition-duration: 0.4s;
+  -moz-transition-duration: 0.4s;
+  -o-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+  -webkit-transition-timing-function: ease-in;
+  -moz-transition-timing-function: ease-in;
+  -o-transition-timing-function: ease-in;
+  transition-timing-function: ease-in;
+}
+/* line 57, ../sass/application.scss */
+#content .indicate:hover {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+/* line 62, ../sass/application.scss */
+#content .indicate:nth-child(odd) {
+  top: 22px;
+}
+/* line 65, ../sass/application.scss */
+#content .indicate_selected {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+/* line 68, ../sass/application.scss */
+#content .slider {
+  position: absolute;
+  z-index: 10;
+}
+/* line 72, ../sass/application.scss */
+#content #loader_wrapper {
+  position: absolute;
+}
+/* line 74, ../sass/application.scss */
+#content #loader_wrapper #swoop_loader {
+  position: relative;
+  width: 90px;
+  height: 90px;
+}
+/* line 78, ../sass/application.scss */
+#content #loader_wrapper #swoop_loader .wBall {
+  position: absolute;
+  width: 86px;
+  height: 86px;
+  opacity: 0;
+  -moz-transform: rotate(225deg);
+  -moz-animation: orbit 7.15s infinite;
+  -webkit-transform: rotate(225deg);
+  -webkit-animation: orbit 7.15s infinite;
+  -ms-transform: rotate(225deg);
+  -ms-animation: orbit 7.15s infinite;
+  -o-transform: rotate(225deg);
+  -o-animation: orbit 7.15s infinite;
+  transform: rotate(225deg);
+  animation: orbit 7.15s infinite;
+}
+/* line 93, ../sass/application.scss */
+#content #loader_wrapper #swoop_loader .wBall .wInnerBall {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  background: #000000;
+  left: 0px;
+  top: 0px;
+  -moz-border-radius: 11px;
+  -webkit-border-radius: 11px;
+  -ms-border-radius: 11px;
+  -o-border-radius: 11px;
+  border-radius: 11px;
+}
+/* line 107, ../sass/application.scss */
+#content #loader_wrapper #swoop_loader #wBall_1 {
+  -moz-animation-delay: 1.56s;
+  -webkit-animation-delay: 1.56s;
+  -ms-animation-delay: 1.56s;
+  -o-animation-delay: 1.56s;
+  animation-delay: 1.56s;
+}
+/* line 114, ../sass/application.scss */
+#content #loader_wrapper #swoop_loader #wBall_2 {
+  -moz-animation-delay: 0.31s;
+  -webkit-animation-delay: 0.31s;
+  -ms-animation-delay: 0.31s;
+  -o-animation-delay: 0.31s;
+  animation-delay: 0.31s;
+}
+/* line 121, ../sass/application.scss */
+#content #loader_wrapper #swoop_loader #wBall_3 {
+  -moz-animation-delay: 0.62s;
+  -webkit-animation-delay: 0.62s;
+  -ms-animation-delay: 0.62s;
+  -o-animation-delay: 0.62s;
+  animation-delay: 0.62s;
+}
+/* line 128, ../sass/application.scss */
+#content #loader_wrapper #swoop_loader #wBall_4 {
+  -moz-animation-delay: 0.94s;
+  -webkit-animation-delay: 0.94s;
+  -ms-animation-delay: 0.94s;
+  -o-animation-delay: 0.94s;
+  animation-delay: 0.94s;
+}
+/* line 135, ../sass/application.scss */
+#content #loader_wrapper #swoop_loader #wBall_5 {
+  -moz-animation-delay: 1.25s;
+  -webkit-animation-delay: 1.25s;
+  -ms-animation-delay: 1.25s;
+  -o-animation-delay: 1.25s;
+  animation-delay: 1.25s;
+}
+
+@-moz-keyframes orbit {
+  /* line 146, ../sass/application.scss */
+  0% {
+    opacity: 1;
+    z-index: 99;
+    -moz-transform: rotate(180deg);
+    -moz-animation-timing-function: ease-out;
+  }
+
+  /* line 152, ../sass/application.scss */
+  7% {
+    opacity: 1;
+    -moz-transform: rotate(300deg);
+    -moz-animation-timing-function: linear;
+    -moz-origin: 0%;
+  }
+
+  /* line 158, ../sass/application.scss */
+  30% {
+    opacity: 1;
+    -moz-transform: rotate(410deg);
+    -moz-animation-timing-function: ease-in-out;
+    -moz-origin: 7%;
+  }
+
+  /* line 164, ../sass/application.scss */
+  39% {
+    opacity: 1;
+    -moz-transform: rotate(645deg);
+    -moz-animation-timing-function: linear;
+    -moz-origin: 30%;
+  }
+
+  /* line 170, ../sass/application.scss */
+  70% {
+    opacity: 1;
+    -moz-transform: rotate(770deg);
+    -moz-animation-timing-function: ease-out;
+    -moz-origin: 39%;
+  }
+
+  /* line 176, ../sass/application.scss */
+  75% {
+    opacity: 1;
+    -moz-transform: rotate(900deg);
+    -moz-animation-timing-function: ease-out;
+    -moz-origin: 70%;
+  }
+
+  /* line 182, ../sass/application.scss */
+  76% {
+    opacity: 0;
+    -moz-transform: rotate(900deg);
+  }
+
+  /* line 186, ../sass/application.scss */
+  100% {
+    opacity: 0;
+    -moz-transform: rotate(900deg);
+  }
+}
+
+@-webkit-keyframes orbit {
+  /* line 194, ../sass/application.scss */
+  0% {
+    opacity: 1;
+    z-index: 99;
+    -webkit-transform: rotate(180deg);
+    -webkit-animation-timing-function: ease-out;
+  }
+
+  /* line 200, ../sass/application.scss */
+  7% {
+    opacity: 1;
+    -webkit-transform: rotate(300deg);
+    -webkit-animation-timing-function: linear;
+    -webkit-origin: 0%;
+  }
+
+  /* line 206, ../sass/application.scss */
+  30% {
+    opacity: 1;
+    -webkit-transform: rotate(410deg);
+    -webkit-animation-timing-function: ease-in-out;
+    -webkit-origin: 7%;
+  }
+
+  /* line 212, ../sass/application.scss */
+  39% {
+    opacity: 1;
+    -webkit-transform: rotate(645deg);
+    -webkit-animation-timing-function: linear;
+    -webkit-origin: 30%;
+  }
+
+  /* line 218, ../sass/application.scss */
+  70% {
+    opacity: 1;
+    -webkit-transform: rotate(770deg);
+    -webkit-animation-timing-function: ease-out;
+    -webkit-origin: 39%;
+  }
+
+  /* line 224, ../sass/application.scss */
+  75% {
+    opacity: 1;
+    -webkit-transform: rotate(900deg);
+    -webkit-animation-timing-function: ease-out;
+    -webkit-origin: 70%;
+  }
+
+  /* line 230, ../sass/application.scss */
+  76% {
+    opacity: 0;
+    -webkit-transform: rotate(900deg);
+  }
+
+  /* line 234, ../sass/application.scss */
+  100% {
+    opacity: 0;
+    -webkit-transform: rotate(900deg);
+  }
+}
+
+@-ms-keyframes orbit {
+  /* line 242, ../sass/application.scss */
+  0% {
+    opacity: 1;
+    z-index: 99;
+    -ms-transform: rotate(180deg);
+    -ms-animation-timing-function: ease-out;
+  }
+
+  /* line 248, ../sass/application.scss */
+  7% {
+    opacity: 1;
+    -ms-transform: rotate(300deg);
+    -ms-animation-timing-function: linear;
+    -ms-origin: 0%;
+  }
+
+  /* line 254, ../sass/application.scss */
+  30% {
+    opacity: 1;
+    -ms-transform: rotate(410deg);
+    -ms-animation-timing-function: ease-in-out;
+    -ms-origin: 7%;
+  }
+
+  /* line 260, ../sass/application.scss */
+  39% {
+    opacity: 1;
+    -ms-transform: rotate(645deg);
+    -ms-animation-timing-function: linear;
+    -ms-origin: 30%;
+  }
+
+  /* line 266, ../sass/application.scss */
+  70% {
+    opacity: 1;
+    -ms-transform: rotate(770deg);
+    -ms-animation-timing-function: ease-out;
+    -ms-origin: 39%;
+  }
+
+  /* line 272, ../sass/application.scss */
+  75% {
+    opacity: 1;
+    -ms-transform: rotate(900deg);
+    -ms-animation-timing-function: ease-out;
+    -ms-origin: 70%;
+  }
+
+  /* line 278, ../sass/application.scss */
+  76% {
+    opacity: 0;
+    -ms-transform: rotate(900deg);
+  }
+
+  /* line 282, ../sass/application.scss */
+  100% {
+    opacity: 0;
+    -ms-transform: rotate(900deg);
+  }
+}
+
+@-o-keyframes orbit {
+  /* line 290, ../sass/application.scss */
+  0% {
+    opacity: 1;
+    z-index: 99;
+    -o-transform: rotate(180deg);
+    -o-animation-timing-function: ease-out;
+  }
+
+  /* line 296, ../sass/application.scss */
+  7% {
+    opacity: 1;
+    -o-transform: rotate(300deg);
+    -o-animation-timing-function: linear;
+    -o-origin: 0%;
+  }
+
+  /* line 302, ../sass/application.scss */
+  30% {
+    opacity: 1;
+    -o-transform: rotate(410deg);
+    -o-animation-timing-function: ease-in-out;
+    -o-origin: 7%;
+  }
+
+  /* line 308, ../sass/application.scss */
+  39% {
+    opacity: 1;
+    -o-transform: rotate(645deg);
+    -o-animation-timing-function: linear;
+    -o-origin: 30%;
+  }
+
+  /* line 314, ../sass/application.scss */
+  70% {
+    opacity: 1;
+    -o-transform: rotate(770deg);
+    -o-animation-timing-function: ease-out;
+    -o-origin: 39%;
+  }
+
+  /* line 320, ../sass/application.scss */
+  75% {
+    opacity: 1;
+    -o-transform: rotate(900deg);
+    -o-animation-timing-function: ease-out;
+    -o-origin: 70%;
+  }
+
+  /* line 326, ../sass/application.scss */
+  76% {
+    opacity: 0;
+    -o-transform: rotate(900deg);
+  }
+
+  /* line 330, ../sass/application.scss */
+  100% {
+    opacity: 0;
+    -o-transform: rotate(900deg);
+  }
+}
+
+@keyframes orbit {
+  /* line 338, ../sass/application.scss */
+  0% {
+    opacity: 1;
+    z-index: 99;
+    transform: rotate(180deg);
+    animation-timing-function: ease-out;
+  }
+
+  /* line 344, ../sass/application.scss */
+  7% {
+    opacity: 1;
+    transform: rotate(300deg);
+    animation-timing-function: linear;
+    origin: 0%;
+  }
+
+  /* line 350, ../sass/application.scss */
+  30% {
+    opacity: 1;
+    transform: rotate(410deg);
+    animation-timing-function: ease-in-out;
+    origin: 7%;
+  }
+
+  /* line 356, ../sass/application.scss */
+  39% {
+    opacity: 1;
+    transform: rotate(645deg);
+    animation-timing-function: linear;
+    origin: 30%;
+  }
+
+  /* line 362, ../sass/application.scss */
+  70% {
+    opacity: 1;
+    transform: rotate(770deg);
+    animation-timing-function: ease-out;
+    origin: 39%;
+  }
+
+  /* line 368, ../sass/application.scss */
+  75% {
+    opacity: 1;
+    transform: rotate(900deg);
+    animation-timing-function: ease-out;
+    origin: 70%;
+  }
+
+  /* line 374, ../sass/application.scss */
+  76% {
+    opacity: 0;
+    transform: rotate(900deg);
+  }
+
+  /* line 378, ../sass/application.scss */
+  100% {
+    opacity: 0;
+    transform: rotate(900deg);
+  }
+}

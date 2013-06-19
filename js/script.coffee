@@ -30,7 +30,7 @@ Canvas = null
 context = null
 total_images = null
 images = []
-window.breakCounter = -1
+breakCounter = -1
 lines = [
   line1 = {
     frame: 14
@@ -254,12 +254,13 @@ CTA_buttons = ->
 
 # Highlight indicator when the user lands on the relevant breakpoint
 updateIndicators = (ui) ->
-  if ($('.indicate').hasClass 'indicator-' + ui)
-    $('.indicate').removeClass "indicate_selected"
+  $elem = $('.indicate')
+  if ($elem.hasClass 'indicator-' + ui)
+    $elem.removeClass "indicate_selected"
     $('.indicator-' + ui).addClass "indicate_selected"
     SwoopGAData.send(["click", "breakpoint-"+ui])
   else
-    $('.indicate').removeClass "indicate_selected"
+    $elem.removeClass "indicate_selected"
 
 # Position the CSS3 loading animation
 positionLoader = ->
@@ -311,6 +312,7 @@ previousBreakpoint = (lineArray) ->
     else if breakCounter is lineArray.length-1
       updateBackwardSwipe lineArray, slideFrame.previous
     else
+      updateBackwardSwipe lineArray, slideFrame.previous
   # The slideFrame.current variable is updated with the new lineData.frame value before it reaches the second iteration of the if statement. This results in the second if iteration to evaluate a second argument, as detailed above, because the slideFrame object is global. By uisng the slideFrame.swipe_current value and only updating the value after the for loop, enables us to evaluate only one argument in the statement.
   # Also check if breakcounter is less than 0, set swipe_current value to 0 (frame)
   if breakCounter is -1 
